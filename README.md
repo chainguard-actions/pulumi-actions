@@ -1,6 +1,12 @@
 # pulumi/actions
 
-Hardened GitHub Action by [Chainguard](https://www.chainguard.dev).
+Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/pulumi/actions](https://github.com/pulumi/actions).
+
+## Versions
+
+| Version | Tag | Upstream commit |
+|---------|-----|-----------------|
+| v6.6.1 | [`v6.6.1`](https://github.com/chainguard-actions/actions/tree/v6.6.1) | — |
 
 ## Privacy
 
