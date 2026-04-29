@@ -1,5 +1,6 @@
 {
   "owner": "pulumi",
   "name": "actions",
-  "visibility": ""
+  "visibility": "internal",
+  "description": "Deploy continuously to your cloud of choice, using your favorite language, Pulumi, and GitHub!"
 }

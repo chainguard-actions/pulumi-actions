@@ -1,5 +1,7 @@
 # pulumi/actions
 
+Deploy continuously to your cloud of choice, using your favorite language, Pulumi, and GitHub!
+
 Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/pulumi/actions](https://github.com/pulumi/actions).
 
 ## Versions
