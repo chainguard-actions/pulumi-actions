@@ -1,4 +1,6 @@
 {
-  "upstream": "pulumi/actions",
-  "version": "v6.6.1"
+  "owner": "pulumi",
+  "repo": "actions",
+  "version": "",
+  "url": "https://github.com/pulumi/actions"
 }
