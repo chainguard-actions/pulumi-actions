@@ -8,7 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
-| v6.6.1 | [`v6.6.1`](https://github.com/chainguard-actions/actions/tree/v6.6.1) | — |
+| v6.6.1 | [`v6.6.1`](https://github.com/chainguard-actions/pulumi--actions/tree/v6.6.1) | — |
 
 ## Privacy
 
