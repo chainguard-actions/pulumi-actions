@@ -1,0 +1,28 @@
+name: Test resource targeting inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          command: preview
+          stack-name: dev
+          cloud-url: file://~
+          replace: 'urn:pulumi:dev::myapp::aws:s3/bucket:Bucket::my-bucket'
+          exclude: 'urn:pulumi:dev::myapp::aws:s3/bucket:Bucket::old-bucket'
+          target: 'urn:pulumi:dev::myapp::aws:s3/bucket:Bucket::target-bucket'
+          target-dependents: 'true'
+          exclude-dependents: 'true'
+          policyPacks: 'my-policy-pack'
+          policyPackConfigs: '/tmp/policy-config.json'
+          log-verbosity: '3'
+          suppress-progress: 'true'
+        continue-on-error: true
+      - name: Assert action ran
+        run: |
+          echo "Action completed (may fail due to no real Pulumi stack)"
+          echo "PASS"

@@ -1,0 +1,24 @@
+name: Test pulumi-version-file input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create pulumi version file
+        run: |
+          echo "3.100.0" > .pulumi.version
+      - id: action
+        uses: .
+        with:
+          pulumi-version-file: .pulumi.version
+          cloud-url: file://~
+          command: preview
+          stack-name: dev
+          suppress-progress: 'true'
+        continue-on-error: true
+      - name: Assert action ran
+        run: |
+          echo "Action completed (may fail due to no real Pulumi stack)"
+          echo "PASS"

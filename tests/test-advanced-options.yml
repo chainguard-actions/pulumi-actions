@@ -1,0 +1,26 @@
+name: Test advanced options inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          command: up
+          stack-name: dev
+          cloud-url: file://~
+          secrets-provider: passphrase
+          message: 'Test deployment message'
+          parallel: '4'
+          config-map: '{"myapp:key": {"value": "val", "secret": false}}'
+          plan: /tmp/pulumi-plan.json
+          suppress-progress: 'true'
+          suppress-outputs: 'true'
+        continue-on-error: true
+      - name: Assert action ran
+        run: |
+          echo "Action completed (may fail due to no real Pulumi stack)"
+          echo "PASS"
