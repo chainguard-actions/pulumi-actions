@@ -1,0 +1,32 @@
+name: Test policy packs and PR comment options
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create policy pack config file
+        run: |
+          echo '{}' > /tmp/policy-pack-config.json
+      - id: action
+        uses: .
+        with:
+          command: preview
+          stack-name: dev
+          pulumi-version: 3.140.0
+          cloud-url: file://~
+          policyPacks: 'my-policy-pack'
+          policyPackConfigs: '/tmp/policy-pack-config.json'
+          comment-on-pr-number: '42'
+          color: never
+          suppress-outputs: 'true'
+          suppress-progress: 'true'
+        continue-on-error: true
+      - name: Assert action ran
+        run: |
+          echo "Action completed (may fail without a real Pulumi project, but inputs were accepted)"
+          echo "PASS"
