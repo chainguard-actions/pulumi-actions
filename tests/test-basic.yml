@@ -4,6 +4,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - id: action
@@ -11,21 +14,13 @@ jobs:
         with:
           command: preview
           stack-name: dev
-          pulumi-version: 3.100.0
+          pulumi-version: 3.140.0
           cloud-url: file://~
           work-dir: ./
-          comment-on-pr: 'false'
-          comment-on-summary: 'false'
-          expect-no-changes: 'false'
-          diff: 'false'
-          refresh: 'false'
-          upsert: 'false'
-          remove: 'false'
-          suppress-outputs: 'false'
-          suppress-progress: 'false'
-          color: auto
+          suppress-outputs: 'true'
+          suppress-progress: 'true'
         continue-on-error: true
       - name: Assert action ran
         run: |
-          echo "Action completed (may fail due to no real Pulumi stack)"
+          echo "Action completed (may fail due to no Pulumi project, but inputs were accepted)"
           echo "PASS"

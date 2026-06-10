@@ -1,4 +1,4 @@
-name: Test plan and targeting inputs
+name: Test version file and config inputs
 on:
   workflow_dispatch:
 jobs:
@@ -9,19 +9,19 @@ jobs:
       GITHUB_EVENT_NAME: push
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create pulumi version file
+        run: echo "3.140.0" > .pulumi.version
       - id: action
         uses: .
         with:
           command: preview
           stack-name: dev
-          pulumi-version: 3.140.0
+          pulumi-version-file: .pulumi.version
           cloud-url: file://~
-          plan: /tmp/pulumi-plan.json
-          replace: 'urn:pulumi:dev::myproject::aws:s3/bucket:Bucket::my-bucket'
-          exclude: 'urn:pulumi:dev::myproject::aws:s3/bucket:Bucket::old-bucket'
-          target: 'urn:pulumi:dev::myproject::aws:s3/bucket:Bucket::my-bucket'
-          policyPacks: 'my-policy-pack'
-          policyPackConfigs: '/tmp/policy-config.json'
+          secrets-provider: passphrase
+          parallel: '4'
+          message: 'test update message'
+          config-map: '{"myproject:key": {"value": "val", "secret": false}}'
           suppress-outputs: 'true'
           suppress-progress: 'true'
         continue-on-error: true

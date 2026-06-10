@@ -1,12 +1,14 @@
-name: Test plan and targeting inputs
+name: Test PR comment and logging inputs
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      GITHUB_REF: refs/heads/main
-      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/pull/1/merge
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_HEAD_REF: feature-branch
+      GITHUB_BASE_REF: main
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - id: action
@@ -16,12 +18,12 @@ jobs:
           stack-name: dev
           pulumi-version: 3.140.0
           cloud-url: file://~
-          plan: /tmp/pulumi-plan.json
-          replace: 'urn:pulumi:dev::myproject::aws:s3/bucket:Bucket::my-bucket'
-          exclude: 'urn:pulumi:dev::myproject::aws:s3/bucket:Bucket::old-bucket'
-          target: 'urn:pulumi:dev::myproject::aws:s3/bucket:Bucket::my-bucket'
-          policyPacks: 'my-policy-pack'
-          policyPackConfigs: '/tmp/policy-config.json'
+          comment-on-pr: 'false'
+          comment-on-pr-number: '42'
+          comment-on-summary: 'false'
+          log-verbosity: '3'
+          log-flow: 'false'
+          debug: 'false'
           suppress-outputs: 'true'
           suppress-progress: 'true'
         continue-on-error: true
