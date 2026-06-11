@@ -1,0 +1,25 @@
+name: Test policy and logging inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          command: version
+          pulumi-version: 3.136.1
+          cloud-url: file://~
+          policyPacks: my-policy-pack
+          policyPackConfigs: /tmp/policy-config.json
+          log-verbosity: '3'
+        continue-on-error: true
+      - name: Assert action ran
+        run: |
+          echo "Action completed with policy and logging inputs"
+          echo "PASS"

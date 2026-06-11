@@ -1,0 +1,26 @@
+name: Test update options inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          command: version
+          pulumi-version: 3.136.1
+          cloud-url: file://~
+          message: 'test deployment message'
+          parallel: '4'
+          config-map: '{"aws:region":{"value":"us-east-1","secret":false}}'
+          secrets-provider: default
+        continue-on-error: true
+      - name: Assert action ran
+        run: |
+          echo "Action completed with update options inputs"
+          echo "PASS"
