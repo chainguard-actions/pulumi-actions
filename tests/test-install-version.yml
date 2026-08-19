@@ -1,0 +1,29 @@
+name: Test Pulumi CLI version installation
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          pulumi-version: 3.100.0
+        continue-on-error: true
+      - name: Assert Pulumi CLI was installed
+        run: |
+          if ! command -v pulumi &>/dev/null; then
+            echo "FAIL: pulumi CLI not found in PATH"
+            exit 1
+          fi
+          VERSION=$(pulumi version 2>/dev/null || echo "unknown")
+          echo "Pulumi version: $VERSION"
+          if [[ "$VERSION" != *"3.100.0"* ]]; then
+            echo "FAIL: expected version 3.100.0, got $VERSION"
+            exit 1
+          fi
+          echo "PASS: Pulumi CLI installed at expected version"

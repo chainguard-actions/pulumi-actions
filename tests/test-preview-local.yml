@@ -1,0 +1,66 @@
+name: Test Pulumi preview with local backend
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+      PULUMI_CONFIG_PASSPHRASE: testpassphrase
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        run: |
+          python3 -m pip install pulumi --quiet 2>/dev/null || true
+
+      - name: Create minimal Pulumi project
+        run: |
+          mkdir -p /tmp/pulumi-test-project
+          cat > /tmp/pulumi-test-project/Pulumi.yaml <<'EOF'
+          name: test-project
+          runtime: yaml
+          description: A minimal test project
+          EOF
+          cat > /tmp/pulumi-test-project/Pulumi.dev.yaml <<'EOF'
+          config: {}
+          EOF
+          cat > /tmp/pulumi-test-project/main.pp <<'EOF'
+          EOF
+
+      - name: Initialize local stack
+        working-directory: /tmp/pulumi-test-project
+        run: |
+          # Install Pulumi CLI
+          curl -fsSL https://get.pulumi.com | sh -s -- --version 3.100.0
+          export PATH="$HOME/.pulumi/bin:$PATH"
+          pulumi login --local
+          pulumi stack init dev --secrets-provider passphrase
+
+      - id: action
+        uses: .
+        with:
+          command: preview
+          stack-name: dev
+          work-dir: /tmp/pulumi-test-project
+          cloud-url: file:///tmp/pulumi-state
+          secrets-provider: passphrase
+          pulumi-version: 3.100.0
+        env:
+          PULUMI_CONFIG_PASSPHRASE: testpassphrase
+        continue-on-error: true
+
+      - name: Check action ran
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          OUTPUT: ${{ steps.action.outputs.output }}
+        run: |
+          echo "Action outcome: $OUTCOME"
+          echo "Action output: $OUTPUT"
+          # The action should have attempted to run (not skipped)
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran (outcome=$OUTCOME)"

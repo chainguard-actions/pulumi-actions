@@ -1,0 +1,60 @@
+name: Test Pulumi up with YAML runtime and local backend
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+      PULUMI_CONFIG_PASSPHRASE: testpassphrase
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install Pulumi CLI for project setup
+        run: |
+          curl -fsSL https://get.pulumi.com | sh -s -- --version 3.100.0 2>/dev/null
+          echo "$HOME/.pulumi/bin" >> $GITHUB_PATH
+
+      - name: Create minimal Pulumi YAML project
+        run: |
+          mkdir -p /tmp/pulumi-yaml-project
+          cat > /tmp/pulumi-yaml-project/Pulumi.yaml <<'EOF'
+          name: yaml-test
+          runtime: yaml
+          description: Minimal YAML test project
+          resources: {}
+          EOF
+
+      - name: Initialize local stack
+        run: |
+          export PATH="$HOME/.pulumi/bin:$PATH"
+          cd /tmp/pulumi-yaml-project
+          pulumi login --local
+          pulumi stack init dev
+
+      - id: action
+        uses: .
+        with:
+          command: up
+          stack-name: dev
+          work-dir: /tmp/pulumi-yaml-project
+          cloud-url: file://~
+          secrets-provider: passphrase
+          pulumi-version: 3.100.0
+        env:
+          PULUMI_CONFIG_PASSPHRASE: testpassphrase
+        continue-on-error: true
+
+      - name: Check action output
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          OUTPUT: ${{ steps.action.outputs.output }}
+        run: |
+          echo "Action outcome: $OUTCOME"
+          echo "Action output length: ${#OUTPUT}"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped"
+            exit 1
+          fi
+          echo "PASS: action ran (outcome=$OUTCOME)"

@@ -1,0 +1,47 @@
+name: Test Pulumi action in pull request context
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_REF: refs/pull/1/merge
+      GITHUB_HEAD_REF: feature-branch
+      GITHUB_BASE_REF: main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        with:
+          pulumi-version: 3.100.0
+          comment-on-pr: 'false'
+          comment-on-summary: 'false'
+        continue-on-error: true
+
+      - name: Assert action ran in PR context
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "Action outcome: $OUTCOME"
+          # The action should have attempted to run (not skipped)
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly in PR context"
+            exit 1
+          fi
+          echo "PASS: action ran in pull_request context (outcome=$OUTCOME)"
+
+      - name: Assert Pulumi CLI is available
+        run: |
+          if ! command -v pulumi &>/dev/null; then
+            echo "FAIL: pulumi CLI not found in PATH"
+            exit 1
+          fi
+          VERSION=$(pulumi version 2>/dev/null || echo "unknown")
+          echo "Pulumi version: $VERSION"
+          if [[ "$VERSION" != *"3.100.0"* ]]; then
+            echo "FAIL: expected version 3.100.0, got $VERSION"
+            exit 1
+          fi
+          echo "PASS: Pulumi CLI available at correct version in PR context"

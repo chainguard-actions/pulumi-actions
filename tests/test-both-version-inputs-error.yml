@@ -1,0 +1,31 @@
+name: Test error when both version inputs provided
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create Pulumi version file
+        run: |
+          echo "3.100.0" > "$GITHUB_WORKSPACE/.pulumi.version"
+
+      - name: Run action with both version inputs (should fail)
+        id: action
+        uses: .
+        with:
+          pulumi-version: '3.x'
+          pulumi-version-file: '.pulumi.version'
+        continue-on-error: true
+
+      - name: Assert action failed with expected error
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "Step outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail when both pulumi-version and pulumi-version-file are provided, but got outcome: $OUTCOME"
+            exit 1
+          fi
+          echo "PASS: action correctly failed when both version inputs were provided"

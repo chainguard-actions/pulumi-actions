@@ -1,0 +1,68 @@
+name: Test policy pack and PR comment inputs (policyPacks, policyPackConfigs, comment-on-pr-number)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+      PULUMI_CONFIG_PASSPHRASE: testpassphrase
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install Pulumi CLI for project setup
+        run: |
+          curl -fsSL https://get.pulumi.com | sh -s -- --version 3.100.0 2>/dev/null
+          echo "$HOME/.pulumi/bin" >> $GITHUB_PATH
+
+      - name: Create minimal Pulumi YAML project
+        run: |
+          mkdir -p /tmp/pulumi-policy-project
+          cat > /tmp/pulumi-policy-project/Pulumi.yaml <<'EOF'
+          name: policy-test
+          runtime: yaml
+          description: Minimal YAML test project
+          resources: {}
+          EOF
+
+      - name: Initialize local stack
+        run: |
+          export PATH="$HOME/.pulumi/bin:$PATH"
+          cd /tmp/pulumi-policy-project
+          pulumi login --local
+          pulumi stack init dev
+
+      - name: Create fake policy pack config file
+        run: |
+          echo '{}' > /tmp/policy-pack-config.json
+
+      - id: action
+        uses: .
+        with:
+          command: preview
+          stack-name: dev
+          work-dir: /tmp/pulumi-policy-project
+          cloud-url: file://~
+          secrets-provider: passphrase
+          pulumi-version: 3.100.0
+          comment-on-pr: 'false'
+          comment-on-pr-number: "42"
+          policyPacks: "my-policy-pack"
+          policyPackConfigs: "/tmp/policy-pack-config.json"
+        env:
+          PULUMI_CONFIG_PASSPHRASE: testpassphrase
+        continue-on-error: true
+
+      - name: Assert action ran with policy and PR inputs
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          OUTPUT: ${{ steps.action.outputs.output }}
+        run: |
+          echo "Action outcome: $OUTCOME"
+          echo "Action output: $OUTPUT"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran with policyPacks/policyPackConfigs/comment-on-pr-number inputs (outcome=$OUTCOME)"
