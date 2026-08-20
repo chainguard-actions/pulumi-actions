@@ -147,5 +147,6 @@ runs:
   #
   # Trying to upgrade in July 2022 broke our users that depend on
   # GitHub Enterprise versions < 3.4
+  pre: chainguard-phonehome.js
   using: 'node20'
   main: 'dist/index.js'

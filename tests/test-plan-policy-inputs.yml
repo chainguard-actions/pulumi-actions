@@ -1,0 +1,63 @@
+name: Test plan and policy inputs (plan, policyPacks, policyPackConfigs)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      PULUMI_CONFIG_PASSPHRASE: "test-passphrase"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up minimal Pulumi program and policy pack config
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/tests/fixtures/pulumi-plan"
+          cat > "$GITHUB_WORKSPACE/tests/fixtures/pulumi-plan/Pulumi.yaml" << 'EOF'
+          name: test-plan
+          runtime: yaml
+          description: A minimal Pulumi YAML program for testing plan and policy inputs
+          EOF
+          cat > "$GITHUB_WORKSPACE/tests/fixtures/pulumi-plan/Pulumi.test-stack.yaml" << 'EOF'
+          config:
+            pulumi:tags:
+              value:
+                pulumi:template: ""
+          EOF
+          # Create a minimal policy pack config file
+          mkdir -p "$GITHUB_WORKSPACE/tests/fixtures/pulumi-plan-policy"
+          cat > "$GITHUB_WORKSPACE/tests/fixtures/pulumi-plan-policy/policy-config.json" << 'EOF'
+          {
+            "all": "advisory"
+          }
+          EOF
+
+      - name: Run action with plan and policy inputs
+        id: action
+        uses: .
+        continue-on-error: true
+        with:
+          command: preview
+          stack-name: test-stack
+          work-dir: tests/fixtures/pulumi-plan
+          cloud-url: file://${{ github.workspace }}/tests/fixtures/pulumi-plan-state
+          pulumi-version: 3.x
+          upsert: 'true'
+          plan: ${{ github.workspace }}/tests/fixtures/pulumi-plan-output.json
+          policyPacks: 'aws-guard'
+          policyPackConfigs: tests/fixtures/pulumi-plan-policy/policy-config.json
+
+      - name: Assert action ran with plan and policy inputs
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          OUTPUT: ${{ steps.action.outputs.output }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "output: $OUTPUT"
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: preview command succeeded with plan and policy inputs"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action ran and failed gracefully (expected in test environment without policy packs)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

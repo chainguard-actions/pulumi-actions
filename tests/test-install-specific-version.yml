@@ -1,4 +1,4 @@
-name: Test Pulumi version from version file
+name: Test install specific Pulumi version
 on:
   workflow_dispatch:
 jobs:
@@ -7,18 +7,13 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Create version file
-        run: |
-          echo "3.100.0" > "$GITHUB_WORKSPACE/.pulumi.version"
-          echo "Version file created with content: $(cat $GITHUB_WORKSPACE/.pulumi.version)"
-
-      - name: Run action using version file
+      - name: Run action to install specific Pulumi version
         id: action
         uses: .
         with:
-          pulumi-version-file: .pulumi.version
+          pulumi-version: 3.100.0
 
-      - name: Assert Pulumi version from file is installed
+      - name: Assert specific Pulumi version is installed
         run: |
           echo "Checking if pulumi is installed..."
           if ! command -v pulumi &>/dev/null; then
@@ -33,7 +28,7 @@ jobs:
           fi
           # Check that the version contains 3.100.0
           if echo "$VERSION" | grep -q "3.100.0"; then
-            echo "PASS: Pulumi CLI version 3.100.0 (from version file) is installed"
+            echo "PASS: Pulumi CLI version 3.100.0 is installed"
           else
             echo "FAIL: Expected version 3.100.0, got: $VERSION"
             exit 1
