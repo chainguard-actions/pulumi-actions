@@ -1,0 +1,32 @@
+name: Test install default Pulumi version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        name: Run Pulumi action with default version (no command)
+        uses: .
+        # No command input — runs in install-only mode with default pulumi-version='^3'
+
+      - name: Assert Pulumi CLI v3 is installed and on PATH
+        run: |
+          echo "Checking if pulumi v3 is installed..."
+          # The action adds pulumi to PATH via core.addPath / GITHUB_PATH
+          if ! command -v pulumi >/dev/null 2>&1; then
+            echo "FAIL: pulumi CLI not found on PATH after install"
+            exit 1
+          fi
+
+          PULUMI_VERSION=$(pulumi version 2>/dev/null || true)
+          echo "Installed version: $PULUMI_VERSION"
+
+          if echo "$PULUMI_VERSION" | grep -qE "^v3\."; then
+            echo "PASS: pulumi v3.x installed as expected"
+          else
+            echo "FAIL: expected v3.x but got: $PULUMI_VERSION"
+            exit 1
+          fi

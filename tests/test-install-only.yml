@@ -1,0 +1,27 @@
+name: Test install-only mode (no command)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        name: Run Pulumi action in install-only mode
+        uses: .
+        with:
+          pulumi-version: '^3'
+
+      - name: Assert Pulumi CLI is installed and on PATH
+        run: |
+          echo "Checking if pulumi is installed..."
+          # The action adds pulumi to PATH via core.addPath / GITHUB_PATH
+          # It should be available directly after the action step
+          if command -v pulumi >/dev/null 2>&1; then
+            PULUMI_VERSION=$(pulumi version 2>/dev/null || true)
+            echo "PASS: pulumi is on PATH: $PULUMI_VERSION"
+          else
+            echo "FAIL: pulumi CLI not found on PATH after install-only run"
+            exit 1
+          fi

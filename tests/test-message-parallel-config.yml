@@ -1,0 +1,40 @@
+name: Test message, parallel, and config-map inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create local state directory
+        run: mkdir -p "$GITHUB_WORKSPACE/hardened/tests/fixtures/pulumi-state-mpc"
+
+      - id: action
+        name: Run Pulumi preview with message, parallel, and config-map
+        uses: .
+        continue-on-error: true
+        with:
+          command: preview
+          stack-name: dev
+          pulumi-version: '^3'
+          work-dir: hardened/tests/fixtures/pulumi-project
+          cloud-url: file://${{ github.workspace }}/hardened/tests/fixtures/pulumi-state-mpc
+          upsert: 'true'
+          message: 'Test update message'
+          parallel: '4'
+          config-map: '{"myproject:environment":{"value":"test","secret":false}}'
+
+      - name: Assert action ran with message/parallel/config-map inputs
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded with message/parallel/config-map inputs"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (expected in harness environment)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

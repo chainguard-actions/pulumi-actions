@@ -1,0 +1,5 @@
+{
+  "my-policy-pack": {
+    "enforcement-level": "advisory"
+  }
+}
