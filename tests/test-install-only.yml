@@ -1,0 +1,22 @@
+name: Test install-only with pinned pulumi-version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          pulumi-version: 3.150.0
+      - name: Assert pulumi CLI installed with requested version
+        run: |
+          which pulumi || { echo "FAIL: pulumi not on PATH"; exit 1; }
+          ACTUAL="$(pulumi version)"
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "v3.150.0" ]; then
+            echo "FAIL: expected v3.150.0"
+            exit 1
+          fi
+          echo "PASS"

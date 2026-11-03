@@ -1,0 +1,60 @@
+name: Test refresh with run-program
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      PULUMI_CONFIG_PASSPHRASE: test-passphrase
+      PULUMI_SKIP_UPDATE_CHECK: "true"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create Pulumi YAML project
+        run: |
+          mkdir -p "$RUNNER_TEMP/rp-state" "$RUNNER_TEMP/rp-proj"
+          cat > "$RUNNER_TEMP/rp-proj/Pulumi.yaml" <<'EOF'
+          name: act-runprogram-test
+          runtime: yaml
+          outputs:
+            greeting: hello-refresh
+          EOF
+      - id: initial
+        uses: .
+        with:
+          command: up
+          stack-name: dev
+          upsert: "true"
+          pulumi-version: 3.170.0
+          work-dir: ${{ runner.temp }}/rp-proj
+          cloud-url: file://${{ runner.temp }}/rp-state
+          suppress-progress: "true"
+      - id: action
+        uses: .
+        with:
+          command: refresh
+          stack-name: dev
+          pulumi-version: 3.170.0
+          work-dir: ${{ runner.temp }}/rp-proj
+          cloud-url: file://${{ runner.temp }}/rp-state
+          run-program: "true"
+          suppress-progress: "true"
+      - name: Assert refresh output captured
+        env:
+          ACTUAL: ${{ steps.action.outputs.output }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: refresh output is empty"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert stack outputs exported after refresh
+        env:
+          ACTUAL: ${{ steps.action.outputs.greeting }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "hello-refresh" ]; then
+            echo "FAIL: expected 'hello-refresh'"
+            exit 1
+          fi
+          echo "PASS"

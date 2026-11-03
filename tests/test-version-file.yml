@@ -1,0 +1,22 @@
+name: Test install-only with pulumi-version-file
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          pulumi-version-file: tests/fixtures/pulumi.version
+      - name: Assert pulumi CLI installed with version from file
+        run: |
+          which pulumi || { echo "FAIL: pulumi not on PATH"; exit 1; }
+          ACTUAL="$(pulumi version)"
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "v3.140.0" ]; then
+            echo "FAIL: expected v3.140.0"
+            exit 1
+          fi
+          echo "PASS"
