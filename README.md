@@ -8,7 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit | Hardening report |
 |---------|-----|-----------------|------------------|
-| v4.5.1 | [`v4.5.1`](https://github.com/chainguard-actions/pulumi-actions/tree/v4.5.1) | [`a3f382e`](https://github.com/pulumi/actions/commit/a3f382e1242b69ab33854c253c3b580f1226348e) | [`HARDENING.md`](https://github.com/chainguard-actions/pulumi-actions/blob/v4.5.1/HARDENING.md) |
+| v4.5.1 | [`v4.5.1`](https://github.com/chainguard-actions/pulumi-actions/tree/v4.5.1) | [`a3f382e`](https://github.com/pulumi/actions/commit/a3f382e1242b69ab33854c253c3b580f1226348e) | — |
 | v6.6.1 | [`v6.6.1`](https://github.com/chainguard-actions/pulumi-actions/tree/v6.6.1) | [`8582a9e`](https://github.com/pulumi/actions/commit/8582a9e8cc630786854029b4e09281acd6794b58) | [`HARDENING.md`](https://github.com/chainguard-actions/pulumi-actions/blob/v6.6.1/HARDENING.md) |
 | v7.0.0 | [`v7.0.0`](https://github.com/chainguard-actions/pulumi-actions/tree/v7.0.0) | [`8e5e406`](https://github.com/pulumi/actions/commit/8e5e406f4007fca908480587cb9893c07090f58d) | [`HARDENING.md`](https://github.com/chainguard-actions/pulumi-actions/blob/v7.0.0/HARDENING.md) |
 | v7.1.0 | [`v7.1.0`](https://github.com/chainguard-actions/pulumi-actions/tree/v7.1.0) | [`96c7761`](https://github.com/pulumi/actions/commit/96c7761824268174e0d2a4e8c7d75671eebd24a7) | [`HARDENING.md`](https://github.com/chainguard-actions/pulumi-actions/blob/v7.1.0/HARDENING.md) |
