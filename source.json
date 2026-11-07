@@ -4,13 +4,18 @@
   "version": "v7.1.0",
   "commit_sha": "96c7761824268174e0d2a4e8c7d75671eebd24a7",
   "url": "https://github.com/pulumi/actions",
-  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "policy_sha": "374911c4be584df24e6da57af2d990570ef0f859",
   "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
   "test_agent_version": "2",
   "harden_agent_version": "2",
   "node_artifact": {
-    "gcs_uri": "gs://prod-actions-node-artifacts/node-artifacts/pulumi/actions/v7.1.0/sha256-e8807222a85ec9ab99f3bbd073b75d41ef30f086978db067c248bee647ae2765.tar.gz",
+    "gcs_uri": "gs://patch-actions-node-artifacts/node-artifacts/pulumi/actions/v7.1.0/sha256-e8807222a85ec9ab99f3bbd073b75d41ef30f086978db067c248bee647ae2765.tar.gz",
     "sha256": "e8807222a85ec9ab99f3bbd073b75d41ef30f086978db067c248bee647ae2765",
     "size_bytes": 21793985
+  },
+  "dist_artifact": {
+    "gcs_uri": "gs://patch-actions-node-artifacts/dist-artifacts/pulumi/actions/v7.1.0/sha256-639ca8cf07ad36ba18fe559e521baf141103799b15b4629718c002dac7bdf243.tar.gz",
+    "sha256": "639ca8cf07ad36ba18fe559e521baf141103799b15b4629718c002dac7bdf243",
+    "size_bytes": 5199259
   }
 }
