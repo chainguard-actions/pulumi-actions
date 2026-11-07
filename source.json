@@ -4,8 +4,13 @@
   "version": "v6.6.1",
   "commit_sha": "8582a9e8cc630786854029b4e09281acd6794b58",
   "url": "https://github.com/pulumi/actions",
-  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "policy_sha": "374911c4be584df24e6da57af2d990570ef0f859",
   "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
   "test_agent_version": "2",
-  "harden_agent_version": "2"
+  "harden_agent_version": "2",
+  "dist_artifact": {
+    "gcs_uri": "gs://patch-actions-node-artifacts/dist-artifacts/pulumi/actions/v6.6.1/sha256-0a01b9daedc68f1eb5ea7df461931b5859a082e733f5b0a7bbf2876f30972f3d.tar.gz",
+    "sha256": "0a01b9daedc68f1eb5ea7df461931b5859a082e733f5b0a7bbf2876f30972f3d",
+    "size_bytes": 1660650
+  }
 }
